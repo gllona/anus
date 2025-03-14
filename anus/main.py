@@ -8,6 +8,9 @@ import sys
 from anus.core.orchestrator import AgentOrchestrator
 from anus.ui.cli import CLI
 
+# Define version
+__version__ = "0.1.0"
+
 def main():
     """Main entry point for the Anus AI agent"""
     parser = argparse.ArgumentParser(description="Anus AI - Autonomous Networked Utility System")
@@ -15,6 +18,7 @@ def main():
     parser.add_argument("--mode", type=str, default="single", choices=["single", "multi"], help="Agent mode")
     parser.add_argument("--task", type=str, help="Task description")
     parser.add_argument("--verbose", action="store_true", help="Enable verbose output")
+    parser.add_argument("--version", action="version", version=f"ANUS version {__version__}")
     
     args = parser.parse_args()
     
