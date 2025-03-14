@@ -30,17 +30,22 @@ class DummyActionTool(BaseTool):
         "required": ["message"]
     }
     
-    def execute(self, message: str, **kwargs) -> Union[Dict[str, Any], ToolResult]:
+    def execute(self, **kwargs) -> Union[Dict[str, Any], ToolResult]:
         """
         Execute the dummy action.
         
         Args:
-            message: A message to include in the response.
-            **kwargs: Additional parameters (ignored).
+            **kwargs: Parameters including 'message'.
             
         Returns:
             A success response with the provided message.
         """
+        # Extract message from kwargs
+        message = kwargs.get('message', '')
+        if not message and 'query' in kwargs:
+            # Fallback to query parameter if message is not provided
+            message = kwargs.get('query', 'No message provided')
+            
         logging.info(f"Dummy action executed with message: '{message}'")
         return {
             "status": "success",
