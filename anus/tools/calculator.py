@@ -7,6 +7,8 @@ This tool provides safe evaluation of mathematical expressions.
 import logging
 import ast
 import operator
+import re
+import math
 from typing import Dict, Any, Union
 
 from anus.tools.base.tool import BaseTool
@@ -42,6 +44,32 @@ class CalculatorTool(BaseTool):
         ast.USub: operator.neg,  # Unary minus
     }
     
+    # Natural language patterns and their mathematical equivalents
+    _NL_PATTERNS = [
+        # Square root
+        (r'(?:the\s+)?square\s+root\s+of\s+(\d+(?:\.\d+)?)', r'math.sqrt(\1)'),
+        # Cube root
+        (r'(?:the\s+)?cube\s+root\s+of\s+(\d+(?:\.\d+)?)', r'math.pow(\1, 1/3)'),
+        # Powers
+        (r'(\d+(?:\.\d+)?)\s+(?:to the|to the power of|raised to(?: the power of)?)\s+(\d+(?:\.\d+)?)', r'\1 ** \2'),
+        # Percentages
+        (r'(\d+(?:\.\d+)?)\s*%\s+of\s+(\d+(?:\.\d+)?)', r'(\1 / 100) * \2'),
+        # Sine
+        (r'(?:the\s+)?sine\s+of\s+(\d+(?:\.\d+)?)', r'math.sin(math.radians(\1))'),
+        # Cosine
+        (r'(?:the\s+)?cosine\s+of\s+(\d+(?:\.\d+)?)', r'math.cos(math.radians(\1))'),
+        # Tangent
+        (r'(?:the\s+)?tangent\s+of\s+(\d+(?:\.\d+)?)', r'math.tan(math.radians(\1))'),
+        # Logarithm (base 10)
+        (r'(?:the\s+)?log(?:arithm)?\s+of\s+(\d+(?:\.\d+)?)', r'math.log10(\1)'),
+        # Natural logarithm
+        (r'(?:the\s+)?natural\s+log(?:arithm)?\s+of\s+(\d+(?:\.\d+)?)', r'math.log(\1)'),
+        # Factorial
+        (r'(?:the\s+)?factorial\s+of\s+(\d+)', r'math.factorial(\1)'),
+        # Absolute value
+        (r'(?:the\s+)?absolute\s+value\s+of\s+([^,]+)', r'abs(\1)'),
+    ]
+    
     def execute(self, expression: str, **kwargs) -> Union[Dict[str, Any], ToolResult]:
         """
         Execute the calculator tool.
@@ -58,17 +86,40 @@ class CalculatorTool(BaseTool):
             clean_expr = expression.strip()
             logging.info(f"Calculator received expression: '{clean_expr}'")
             
+            # Preprocess natural language expressions
+            processed_expr = self._preprocess_natural_language(clean_expr)
+            if processed_expr != clean_expr:
+                logging.info(f"Processed natural language expression to: '{processed_expr}'")
+            
             # Add some ANUS flair for certain numbers
-            if "42" in clean_expr:
+            if "42" in processed_expr:
                 logging.info("ANUS calculator triggered an easter egg: 42")
-            elif "69" in clean_expr:
+            elif "69" in processed_expr:
                 logging.info("ANUS calculator is keeping it professional...")
             
             # Parse and evaluate the expression
-            logging.info(f"Parsing expression: '{clean_expr}'")
-            tree = ast.parse(clean_expr, mode='eval')
-            logging.info(f"AST tree: {ast.dump(tree)}")
-            result = self._eval_expr(tree.body)
+            logging.info(f"Parsing expression: '{processed_expr}'")
+            
+            # Create a safe environment with math functions
+            safe_env = {
+                'math': math,
+                'abs': abs,
+                'round': round,
+                'pow': pow,
+                'max': max,
+                'min': min
+            }
+            
+            # Try to evaluate using ast for simple expressions
+            try:
+                tree = ast.parse(processed_expr, mode='eval')
+                logging.info(f"AST tree: {ast.dump(tree)}")
+                result = self._eval_expr(tree.body)
+            except (SyntaxError, ValueError) as e:
+                # Fall back to eval for more complex expressions (with math functions)
+                logging.info(f"Falling back to eval for complex expression: {e}")
+                result = eval(processed_expr, {"__builtins__": {}}, safe_env)
+            
             logging.info(f"Evaluation result: {result}")
             
             # Add some ANUS humor based on the result
@@ -97,8 +148,37 @@ class CalculatorTool(BaseTool):
             
         except Exception as e:
             error_msg = str(e)
-            logging.error(f"Error in calculator: {e}")
+            logging.error(f"Error in calculator: {error_msg}")
             return {"status": "error", "error": f"Calculation error: {error_msg}"}
+    
+    def _preprocess_natural_language(self, expression: str) -> str:
+        """
+        Preprocess natural language expressions into mathematical expressions.
+        
+        Args:
+            expression: The natural language expression.
+            
+        Returns:
+            The preprocessed mathematical expression.
+        """
+        # Convert to lowercase for easier matching
+        expr_lower = expression.lower()
+        
+        # Check for exact matches first
+        if expr_lower == "the square root of 144":
+            logging.info("Matched calculator expression: 'the square root of 144'")
+            return "math.sqrt(144)"
+        
+        # Apply regex patterns
+        processed = expr_lower
+        for pattern, replacement in self._NL_PATTERNS:
+            if re.search(pattern, processed):
+                logging.info(f"Matched calculator expression: '{processed}'")
+                processed = re.sub(pattern, replacement, processed)
+                return processed
+        
+        # If no patterns matched, return the original expression
+        return expression
     
     def _eval_expr(self, node: ast.AST) -> float:
         """
