@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANUS - Autonomous Networked Utility System</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+</head>
+<body>
+    <div class="container-fluid">
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2 sidebar">
+                <div class="logo-container">
+                    <img src="{{ url_for('static', filename='anus_logo.png') }}" alt="ANUS Logo" class="logo">
+                    <h1 class="text-center">ANUS</h1>
+                    <p class="text-center mb-4">Autonomous Networked Utility System</p>
+                </div>
+                
+                <div class="sidebar-menu">
+                    <div class="menu-item active" id="nav-home">
+                        <i class="fas fa-home"></i> Home
+                    </div>
+                    <div class="menu-item" id="nav-history">
+                        <i class="fas fa-history"></i> History
+                    </div>
+                    <div class="menu-item" id="nav-settings">
+                        <i class="fas fa-cog"></i> Settings
+                    </div>
+                    <div class="menu-item" id="nav-about">
+                        <i class="fas fa-info-circle"></i> About
+                    </div>
+                </div>
+                
+                <div class="version-info text-center">
+                    <p>Version 0.1.0</p>
+                </div>
+            </div>
+            
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+                <header class="header">
+                    <h2>Welcome to ANUS</h2>
+                    <p>Your intelligent assistant for complex tasks</p>
+                </header>
+                
+                <!-- Home Section -->
+                <div class="content-section active" id="section-home">
+                    <div class="task-container">
+                        <div class="form-group">
+                            <label for="task-input" class="form-label">What would you like ANUS to do?</label>
+                            <textarea id="task-input" class="form-control" rows="4" placeholder="Enter your task or question here..."></textarea>
+                        </div>
+                        
+                        <div class="mode-selector mb-3">
+                            <label class="form-label">Mode:</label>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="mode" id="mode-auto" value="auto" checked>
+                                <label class="form-check-label" for="mode-auto">Auto</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="mode" id="mode-single" value="single">
+                                <label class="form-check-label" for="mode-single">Single Agent</label>
+                            </div>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="radio" name="mode" id="mode-multi" value="multi">
+                                <label class="form-check-label" for="mode-multi">Multi Agent</label>
+                            </div>
+                        </div>
+                        
+                        <button id="submit-task" class="btn btn-primary">
+                            <i class="fas fa-paper-plane"></i> Submit Task
+                        </button>
+                    </div>
+                    
+                    <div class="response-container mt-5">
+                        <h3>Response</h3>
+                        <div id="task-info" class="task-info">
+                            <div class="task-complexity">
+                                <span class="label">Task Complexity:</span>
+                                <span id="complexity-value">N/A</span>
+                            </div>
+                            <div class="processing-mode">
+                                <span class="label">Processing Mode:</span>
+                                <span id="mode-value">N/A</span>
+                            </div>
+                        </div>
+                        <div id="loading" class="loading-indicator">
+                            <div class="spinner-border text-primary" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                            <p>ANUS is processing your task...</p>
+                        </div>
+                        <div id="response-content" class="response-content">
+                            <p id="response-text">Your response will appear here.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- History Section -->
+                <div class="content-section" id="section-history">
+                    <h3>Task History</h3>
+                    <div id="history-container" class="history-container">
+                        <p class="text-center">Loading history...</p>
+                    </div>
+                </div>
+                
+                <!-- Settings Section -->
+                <div class="content-section" id="section-settings">
+                    <h3>Settings</h3>
+                    <div class="settings-container">
+                        <div class="form-group mb-3">
+                            <label for="api-key" class="form-label">API Key:</label>
+                            <input type="password" id="api-key" class="form-control" placeholder="Enter your API key">
+                        </div>
+                        <div class="form-group mb-3">
+                            <label for="model-select" class="form-label">Model:</label>
+                            <select id="model-select" class="form-select">
+                                <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+                                <option value="claude-2">Claude 2</option>
+                            </select>
+                        </div>
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="verbose-mode">
+                            <label class="form-check-label" for="verbose-mode">Verbose Mode</label>
+                        </div>
+                        <button id="save-settings" class="btn btn-primary">Save Settings</button>
+                    </div>
+                </div>
+                
+                <!-- About Section -->
+                <div class="content-section" id="section-about">
+                    <h3>About ANUS</h3>
+                    <div class="about-container">
+                        <p>ANUS (Autonomous Networked Utility System) is a powerful, flexible, and accessible open-source AI agent framework designed to revolutionize task automation. Built with modern AI technologies and best practices, ANUS represents the next generation of AI agent frameworks, offering unparalleled capabilities and ease of use.</p>
+                        
+                        <h4>Features</h4>
+                        <ul>
+                            <li>Hybrid Agent System: Seamlessly switch between single-agent and multi-agent modes</li>
+                            <li>Dynamic Task Planning: Break down complex tasks into manageable steps</li>
+                            <li>Comprehensive Tool Ecosystem: Web automation, document processing, code execution</li>
+                            <li>Flexible Model Support: Works with various AI models</li>
+                            <li>Multi-Agent Collaboration: Specialized agent roles working together</li>
+                        </ul>
+                        
+                        <p>For more information, visit the <a href="https://github.com/nikmcfly/ANUS" target="_blank">GitHub repository</a>.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html> 

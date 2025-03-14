@@ -44,6 +44,23 @@ class HybridAgent(ToolAgent):
             "critic": ToolAgent(name="critic", tools=tools)
         }
     
+    def add_specialized_agent(self, role: str, config: Dict[str, Any]) -> None:
+        """
+        Add or replace a specialized agent with a specific role.
+        
+        Args:
+            role: The role name for the specialized agent.
+            config: Configuration dictionary for the agent.
+        """
+        tools = config.get("tools", [])
+        name = config.get("name", role)
+        
+        self.specialized_agents[role] = ToolAgent(
+            name=name,
+            tools=tools,
+            **{k: v for k, v in config.items() if k not in ["name", "tools"]}
+        )
+    
     def _assess_complexity(self, task: str) -> float:
         """
         Assess the complexity of a task.
