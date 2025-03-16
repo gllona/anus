@@ -171,7 +171,7 @@ source venv/bin/activate  # On Windows: venv\Scripts\activate
 pip install -e .
 
 # Verify installation
-anus --version
+./anus.sh --version
 ```
 
 ### Method 3: Using Docker

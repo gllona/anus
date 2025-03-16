@@ -40,3 +40,9 @@ mypy>=1.5.0
 fastapi>=0.103.0
 uvicorn>=0.23.0
 streamlit>=1.26.0
+
+# Web interface
+flask==2.3.2
+werkzeug==2.3.6
+jinja2==3.1.2
+pillow==11.1.0

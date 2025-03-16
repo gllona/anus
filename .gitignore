@@ -79,4 +79,7 @@ config.yaml
 # Temporary files
 *.bak
 *.tmp
-*.temp 
+*.temp
+
+# Local files not for commit
+/local/
