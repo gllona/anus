@@ -46,25 +46,25 @@ class HybridAgent(ToolAgent):
     
     def add_specialized_agent(self, role: str, config: Dict[str, Any]) -> None:
         """
-        Add a specialized agent to the multi-agent system.
-        
+        Add a specialized agent to the multi-agent system with a specific role.
+
         Args:
             role: The role of the specialized agent.
-            config: Configuration for the specialized agent.
+            config: Configuration dictionary for the specialized agent.
         """
-        name = config.get("name", f"{role}-agent")
+        name = config.get("name", role)
         tools = config.get("tools", [])
         max_iterations = config.get("max_iterations", self.max_iterations)
-        
+
         self.specialized_agents[role] = ToolAgent(
             name=name,
             max_iterations=max_iterations,
             tools=tools,
             **{k: v for k, v in config.items() if k not in ["name", "tools", "max_iterations"]}
         )
-        
+
         logging.info(f"Added {role} agent to ANUS multi-agent system")
-    
+
     def _assess_complexity(self, task: str) -> float:
         """
         Assess the complexity of a task.
